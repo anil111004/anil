@@ -1,0 +1,257 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoGetWell - AI-Powered Wellness Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .smooth-scroll {
+            scroll-behavior: smooth;
+        }
+        .hero-bg {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1506126611910-7d63ffafa336?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-color: #2DD4BF; /* Fallback color */
+        }
+        .gradient-bg {
+            background: linear-gradient(to right, #2DD4BF, #F472B6);
+        }
+        .custom-navy {
+            background-color: #1E3A8A;
+        }
+        .custom-teal {
+            background-color: #2DD4BF;
+        }
+        .custom-coral {
+            background-color: #F472B6;
+        }
+        .custom-cream {
+            background-color: #FEF3C7;
+        }
+        .hover\:custom-coral:hover {
+            color: #F472B6;
+        }
+        .hover\:custom-teal:hover {
+            background-color: #26A69A;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 smooth-scroll">
+    <!-- Navigation -->
+    <nav class="custom-navy text-white shadow-md fixed w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <img class="h-8 w-auto" src="https://via.placeholder.com/150x50?text=GoGetWell" alt="GoGetWell Logo" loading="lazy" onerror="this.src='https://via.placeholder.com/150x50?text=Fallback+Logo'; console.log('Logo failed to load');">
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#features" class="text-white hover:custom-coral">Features</a>
+                    <a href="#pricing" class="text-white hover:custom-coral">Pricing</a>
+                    <a href="#testimonials" class="text-white hover:custom-coral">Testimonials</a>
+                    <a href="#contact" class="custom-teal text-white px-4 py-2 rounded-md hover:custom-teal">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg gradient-bg text-white pt-20 pb-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Transform Your Wellness with AI</h1>
+            <p class="text-lg md:text-xl mb-8">GoGetWell uses advanced AI to deliver personalized health and wellness plans tailored to your needs.</p>
+            <a href="#contact" class="custom-coral text-white px-6 py-3 rounded-md font-semibold hover:bg-pink-500">Start Free Trial</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-1E3A8A mb-12">Why Choose GoGetWell?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center custom-cream p-6 rounded-lg shadow-md">
+                    <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5f478?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="mx-auto mb-4 h-32 w-32 object-cover rounded-full" alt="Personalized AI Wellness Plans" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Fallback+Image'; console.log('AI Plans image failed to load');">
+                    <h3 class="text-xl font-semibold mb-2 text-2DD4BF">Personalized AI Plans</h3>
+                    <p class="text-gray-600">Get tailored wellness recommendations based on your health data and goals.</p>
+                </div>
+                <div class="text-center custom-cream p-6 rounded-lg shadow-md">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="mx-auto mb-4 h-32 w-32 object-cover rounded-full" alt="Real-Time Progress Tracking Dashboard" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Fallback+Image'; console.log('Progress Tracking image failed to load');">
+                    <h3 class="text-xl font-semibold mb-2 text-2DD4BF">Real-Time Progress Tracking</h3>
+                    <p class="text-gray-600">Monitor your health metrics with intuitive dashboards and insights.</p>
+                </div>
+                <div class="text-center custom-cream p-6 rounded-lg shadow-md">
+                    <img src="https://images.unsplash.com/photo-1576091160550-2173fd1be9bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="mx-auto mb-4 h-32 w-32 object-cover rounded-full" alt="Expert Wellness Support" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=Fallback+Image'; console.log('Expert Support image failed to load');">
+                    <h3 class="text-xl font-semibold mb-2 text-2DD4BF">Expert Support</h3>
+                    <p class="text-gray-600">Access 24/7 support from wellness experts to guide your journey.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="custom-cream py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-1E3A8A mb-12">Simple, Transparent Pricing</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-semibold mb-4 text-1E3A8A">Free</h3>
+                    <p class="text-3xl font-bold mb-4 text-1E3A8A">$0<span class="text-sm">/mo</span></p>
+                    <ul class="text-gray-600 mb-6">
+                        <li>Basic AI Wellness Plans</li>
+                        <li>Limited Tracking</li>
+                        <li>Community Support</li>
+                    </ul>
+                    <a href="#contact" class="custom-coral text-white px-4 py-2 rounded-md hover:bg-pink-500">Get Started</a>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center border-2 border-2DD4BF">
+                    <h3 class="text-xl font-semibold mb-4 text-1E3A8A">Pro</h3>
+                    <p class="text-3xl font-bold mb-4 text-1E3A8A">$19<span class="text-sm">/mo</span></p>
+                    <ul class="text-gray-600 mb-6">
+                        <li>Advanced AI Wellness Plans</li>
+                        <li>Full Tracking & Analytics</li>
+                        <li>Priority Support</li>
+                    </ul>
+                    <a href="#contact" class="custom-coral text-white px-4 py-2 rounded-md hover:bg-pink-500">Get Started</a>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <h3 class="text-xl font-semibold mb-4 text-1E3A8A">Enterprise</h3>
+                    <p class="text-3xl font-bold mb-4 text-1E3A8A">Custom</p>
+                    <ul class="text-gray-600 mb-6">
+                        <li>Custom AI Solutions</li>
+                        <li>Dedicated Account Manager</li>
+                        <li>API Access</li>
+                    </ul>
+                    <a href="#contact" class="custom-coral text-white px-4 py-2 rounded-md hover:bg-pink-500">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-16 bg-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-1E3A8A mb-12">What Our Users Say</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="custom-cream p-6 rounded-lg shadow-md flex items-start">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="h-12 w-12 rounded-full mr-4" alt="Sarah M., GoGetWell User" loading="lazy" onerror="this.src='https://via.placeholder.com/100?text=Fallback+Profile'; console.log('Sarah M. image failed to load');">
+                    <div>
+                        <p class="text-F472B6 mb-4">"GoGetWell transformed my daily routine with personalized plans that actually work!"</p>
+                        <p class="font-semibold text-2DD4BF">Sarah M.</p>
+                    </div>
+                </div>
+                <div class="custom-cream p-6 rounded-lg shadow-md flex items-start">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="h-12 w-12 rounded-full mr-4" alt="James R., GoGetWell User" loading="lazy" onerror="this.src='https://via.placeholder.com/100?text=Fallback+Profile'; console.log('James R. image failed to load');">
+                    <div>
+                        <p class="text-F472B6 mb-4">"The real-time tracking helped me stay on top of my goals. Highly recommend!"</p>
+                        <p class="font-semibold text-2DD4BF">James R.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact / CTA Section -->
+    <section id="contact" class="gradient-bg text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+            <p class="text-lg mb-8">Join thousands of users improving their wellness with GoGetWell.</p>
+            <div class="max-w-md mx-auto">
+                <input id="emailInput" type="email" placeholder="Enter your email" class="w-full px-4 py-2 rounded-md mb-4 text-gray-800">
+                <button onclick="subscribe()" class="custom-coral text-white px-6 py-3 rounded-md font-semibold hover:bg-pink-500">Subscribe Now</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="custom-navy text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-2DD4BF">GoGetWell</h3>
+                    <p class="text-gray-300">Empowering wellness through AI innovation.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-2DD4BF">Links</h3>
+                    <ul class="text-gray-300">
+                        <li><a href="#features" class="hover:custom-coral">Features</a></li>
+                        <li><a href="#pricing" class="hover:custom-coral">Pricing</a></li>
+                        <li><a href="#testimonials" class="hover:custom-coral">Testimonials</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4 text-2DD4BF">Contact</h3>
+                    <p class="text-gray-300">Email: support@gogetwell.ai</p>
+                    <p class="text-gray-300">Phone: +91 123-456-7890</p>
+                </div>
+            </div>
+            <p class="text-center text-gray-300 mt-8">© 2025 GoGetWell. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function subscribe() {
+            const email = document.getElementById('emailInput').value;
+            if (email) {
+                alert(`Thank you for subscribing with ${email}!`);
+                document.getElementById('emailInput').value = '';
+            } else {
+                alert('Please enter a valid email address.');
+            }
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
